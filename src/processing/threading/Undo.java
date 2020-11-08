@@ -12,5 +12,6 @@ public class Undo implements Runnable {
 
     public void run() {
         UndoRedo.undo();
+        // TODO send to the network
     }
 }
