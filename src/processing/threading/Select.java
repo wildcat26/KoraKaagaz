@@ -12,7 +12,8 @@ import processing.SelectDelete;
  */
 
 public class Select implements Runnable {
-    private ArrayList<Position> inputPositions, selectedObjectPositions;
+    private final ArrayList<Position> inputPositions;
+    private ArrayList<Position> selectedObjectPositions;
 
     /**
      * Returns all the positions of the object that got selected from
@@ -25,7 +26,7 @@ public class Select implements Runnable {
     }
 
     /**
-     * Initialize input positions needed by select as argument
+     * Initializes input positions needed by select as argument
      *
      * @param inputPositions positions clicked by the user
      */
@@ -34,7 +35,7 @@ public class Select implements Runnable {
     }
 
     /**
-     * Compute the selected object and its positions from the input positions
+     * Computes the selected object and its positions from the input positions
      */
     public void run() {
         this.selectedObjectPositions = SelectDelete.select(inputPositions);
