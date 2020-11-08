@@ -1,11 +1,39 @@
 package processing.threading;
 
+import processing.utility.*;
+import processing.SelectDelete;
+import processing.boardobject.BoardObject;
+import processing.server.board.ServerCommunication;
+import processing.server.board.IServerCommunication;
+
+
 /**
+ * Wrapper class implementing Runnable interface for threading of the delete operation
+ *
  * @author Shruti Umat
  */
 
 public class Delete implements Runnable {
+    private final BoardObject object;
+    private final UserId userId;
+
+    /**
+     * Intialize board object and user id needed by delete as arguments
+     *
+     * @param object object to be deleted
+     * @param userId user id of the user deleting the object
+     */
+    public Delete (BoardObject object, UserId userId) {
+        this.object = object;
+        this.userId = userId;
+    }
+
+    /**
+     * Delete the object initialized and send to the Server Communicator
+     */
     public void run() {
-        return;
+        SelectDelete.delete(this.object, this.userId);
+        IServerCommunication communicator = (IServerCommunication) new ServerCommunication();
+        communicator.sendObject(object);
     }
 }
