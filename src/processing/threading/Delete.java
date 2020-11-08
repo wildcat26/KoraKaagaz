@@ -11,6 +11,7 @@ import processing.server.board.IServerCommunication;
  * Wrapper class implementing Runnable interface for threading of the delete operation
  *
  * @author Shruti Umat
+ * @reviewer Satchit Desai
  */
 
 public class Delete implements Runnable {
@@ -29,11 +30,11 @@ public class Delete implements Runnable {
     }
 
     /**
-     * Delete the object initialized and send to the Server Communicator
+     * Delete the object which was initialized and send it to the Server Communicator
      */
     public void run() {
         SelectDelete.delete(this.object, this.userId);
-        IServerCommunication communicator = (IServerCommunication) new ServerCommunication();
+        IServerCommunication communicator = new ServerCommunication();
         communicator.sendObject(object);
     }
 }
