@@ -67,7 +67,7 @@ public class SelectDelete {
      * @param object object to be deleted
      * @param userId userId of the user who performed the deletion
      */
-    public static void delete (BoardObject object, UserId userId) {
+    public static BoardObject delete (BoardObject object, UserId userId) {
 
         /* Set Delete Operation in Object */
         IBoardObjectOperation deleteOperation = new DeleteOperation();
@@ -96,6 +96,10 @@ public class SelectDelete {
                     .get(CommunicateChange.identifierUI)
                     .giveSelectedPixels(new ArrayList<Pixel>());
         }
+
+        /* Return the original object with correctly set operation (Delete) and user id
+         * to be performed at other clients when receiving the serialized object over the network */
+        return object;
     }
 
 }
