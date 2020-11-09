@@ -1,7 +1,6 @@
 package processing.threading;
 
 import processing.utility.*;
-import processing.ClientBoardState;
 import processing.boardobject.BoardObject;
 import processing.ParameterizedOperationsUtil;
 import processing.server.board.ServerCommunication;
@@ -29,18 +28,16 @@ public class ColorChange implements Runnable {
      * Sends it to the Server Communicator
      */
     public void run() {
-        ObjectId objectId = ParameterizedOperationsUtil.colorChange(object, userId, intensity);
+        BoardObject colorChangeOperationObject =
+                ParameterizedOperationsUtil.colorChange(
+                        object,
+                        userId,
+                        intensity);
 
         /*
-         * Object Id remains the same after the colour change operation
-         * looking up the new object after colour change
-         */
-        BoardObject newObject = ClientBoardState.maps.getBoardObjectFromId(objectId);
-
-        /*
-         * Sending the new object to the board server
+         * Sending the color change operation object to the board server
          */
         IServerCommunication communicator = new ServerCommunication();
-        communicator.sendObject(newObject);
+        communicator.sendObject(colorChangeOperationObject);
     }
 }

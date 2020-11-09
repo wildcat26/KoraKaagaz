@@ -1,7 +1,6 @@
 package processing.threading;
 
 import processing.utility.*;
-import processing.ClientBoardState;
 import processing.boardobject.BoardObject;
 import processing.ParameterizedOperationsUtil;
 import processing.server.board.ServerCommunication;
@@ -25,19 +24,17 @@ public class Rotate implements Runnable {
     }
 
     public void run() {
-        ObjectId objectId = ParameterizedOperationsUtil.rotation(object, userId, angleOfRotation);
+        BoardObject rotateOperationObject =
+                ParameterizedOperationsUtil.rotation(
+                        object,
+                        userId,
+                        angleOfRotation);
 
         /*
-         * Object Id remains the same after the rotation operation
-         * looking up the new object after rotation
-         */
-        BoardObject newObject = ClientBoardState.maps.getBoardObjectFromId(objectId);
-
-        /*
-         * Sending the new object to the board server
+         * Sending the rotate operation object to the board server
          */
         IServerCommunication communicator = new ServerCommunication();
-        communicator.sendObject(newObject);
+        communicator.sendObject(rotateOperationObject);
 
     }
 }

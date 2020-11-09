@@ -33,12 +33,12 @@ public class Delete implements Runnable {
      * Sends it to the Server Communicator
      */
     public void run() {
-        SelectDelete.delete(this.object, this.userId);
+        BoardObject deleteOperationObject = SelectDelete.delete(this.object, this.userId);
 
         /*
-         * Sending the new object to the board server
+         * Sending the delete operation object to the board server
          */
         IServerCommunication communicator = new ServerCommunication();
-        communicator.sendObject(object);
+        communicator.sendObject(deleteOperationObject);
     }
 }
