@@ -37,7 +37,9 @@ public class ColorChange implements Runnable {
         /*
          * Sending the color change operation object to the board server
          */
-        IServerCommunication communicator = new ServerCommunication();
-        communicator.sendObject(colorChangeOperationObject);
+        if (colorChangeOperationObject != null) {
+            IServerCommunication communicator = new ServerCommunication();
+            communicator.sendObject(colorChangeOperationObject);
+        }
     }
 }

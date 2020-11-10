@@ -33,8 +33,9 @@ public class Rotate implements Runnable {
         /*
          * Sending the rotate operation object to the board server
          */
-        IServerCommunication communicator = new ServerCommunication();
-        communicator.sendObject(rotateOperationObject);
-
+        if (rotateOperationObject != null) {
+            IServerCommunication communicator = new ServerCommunication();
+            communicator.sendObject(rotateOperationObject);
+        }
     }
 }

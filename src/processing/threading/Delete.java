@@ -38,7 +38,9 @@ public class Delete implements Runnable {
         /*
          * Sending the delete operation object to the board server
          */
-        IServerCommunication communicator = new ServerCommunication();
-        communicator.sendObject(deleteOperationObject);
+        if (deleteOperationObject != null) {
+            IServerCommunication communicator = new ServerCommunication();
+            communicator.sendObject(deleteOperationObject);
+        }
     }
 }

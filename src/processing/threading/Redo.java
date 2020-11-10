@@ -13,13 +13,21 @@ import processing.server.board.ServerCommunication;
 
 public class Redo implements Runnable {
 
+    /**
+     * Performs the redo operation on the client and sends the object
+     * with the appropriate operation and parameter, if applicable,
+     * which when performed on other clients,
+     * results in redo operation done by this client
+     */
     public void run() {
         BoardObject objectToBeSent = UndoRedo.redo();
 
         /*
          * Sending the redo operation object to the board server
          */
-        IServerCommunication communicator = new ServerCommunication();
-        communicator.sendObject(objectToBeSent);
+        if (objectToBeSent != null) {
+            IServerCommunication communicator = new ServerCommunication();
+            communicator.sendObject(objectToBeSent);
+        }
     }
 }

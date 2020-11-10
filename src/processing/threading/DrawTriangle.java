@@ -18,6 +18,15 @@ public class DrawTriangle implements Runnable {
     private final Position vertC;
     private final Intensity intensity;
 
+    /**
+     * Initializes the parameters to construct a triangle, namely
+     * 3 vertices and the intensity of the triangle
+     *
+     * @param vertA a unique, named vertex of the triangle
+     * @param vertB a unique, named vertex of the triangle
+     * @param vertC a unique, named vertex of the triangle
+     * @param intensity intensity of the triangle to be drawn
+     */
     public DrawTriangle (
             Position vertA,
             Position vertB,
@@ -30,6 +39,10 @@ public class DrawTriangle implements Runnable {
         this.intensity = intensity;
     }
 
+    /**
+     * Builds the triangle as a BoardObject from the initialized parameters
+     * and sends to the board server
+     */
     public void run() {
         BoardObject triangleObject =
                 BoardObjectBuilder.drawTriangle(
@@ -42,7 +55,9 @@ public class DrawTriangle implements Runnable {
         /*
          * Sending the create operation object to the board server
          */
-        IServerCommunication communicator = new ServerCommunication();
-        communicator.sendObject(triangleObject);
+        if (triangleObject != null) {
+            IServerCommunication communicator = new ServerCommunication();
+            communicator.sendObject(triangleObject);
+        }
     }
 }

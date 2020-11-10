@@ -36,6 +36,10 @@ public class DrawCircle implements Runnable {
         this.intensity = intensity;
     }
 
+    /**
+     * Builds the circle as a BoardObject from the initialized parameters
+     * and sends to the board server
+     */
     public void run() {
         BoardObject circleObject =
                 BoardObjectBuilder.drawCircle(
@@ -47,7 +51,10 @@ public class DrawCircle implements Runnable {
         /*
          * Sending the create operation object to the board server
          */
-        IServerCommunication communicator = new ServerCommunication();
-        communicator.sendObject(circleObject);
+
+        if (circleObject != null) {
+            IServerCommunication communicator = new ServerCommunication();
+            communicator.sendObject(circleObject);
+        }
     }
 }

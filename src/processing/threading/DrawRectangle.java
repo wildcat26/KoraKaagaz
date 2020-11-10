@@ -18,6 +18,14 @@ public class DrawRectangle implements Runnable {
     private final Position bottomRight;
     private final Intensity intensity;
 
+    /**
+     * Initializes the parameters to build a rectangle, namely
+     * top left and bottom right positions and intensity
+     *
+     * @param topLeft top left position of the rectangle
+     * @param bottomRight bottom right position of the rectangle
+     * @param intensity intensity of the rectange
+     */
     public DrawRectangle (
             Position topLeft,
             Position bottomRight,
@@ -28,6 +36,10 @@ public class DrawRectangle implements Runnable {
         this.intensity = intensity;
     }
 
+    /**
+     * Builds the rectangle as a BoardObject from the initialized parameters
+     * and sends to the board server
+     */
     public void run() {
         BoardObject rectangeObject =
                 BoardObjectBuilder.drawRectangle(
@@ -39,7 +51,10 @@ public class DrawRectangle implements Runnable {
         /*
          * Sending the create operation object to the board server
          */
-        IServerCommunication communicator = new ServerCommunication();
-        communicator.sendObject(rectangeObject);
+
+        if (rectangeObject != null) {
+            IServerCommunication communicator = new ServerCommunication();
+            communicator.sendObject(rectangeObject);
+        }
     }
 }
