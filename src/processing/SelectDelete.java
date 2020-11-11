@@ -3,6 +3,7 @@ package processing;
 import java.util.*;
 import processing.utility.*;
 import processing.boardobject.*;
+import infrastructure.validation.logger.*;
 
 /**
  * This class contains static methods to implement selection and deletion
