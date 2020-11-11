@@ -1,6 +1,7 @@
 package processing.threading;
 
 import processing.Reset;
+import processing.boardobject.BoardObject;
 import processing.utility.UserId;
 import infrastructure.validation.logger.*;
 
@@ -35,7 +36,7 @@ public class Reset implements Runnable {
         try {
             logger = LoggerFactory.getLoggerInstance();
 
-            Reset.screenReset(userId, reset);
+            BoardObject resetObject = Reset.screenReset(userId, reset);
 
             Helper.log(
                     logger,
@@ -43,6 +44,17 @@ public class Reset implements Runnable {
                     "Reset.screenReset successful"
 
             );
+
+            /*
+             * Sending the reset operation object to the board server
+             */
+            if (resetObject != null) {
+                Helper.sendToBoardServer(
+                        logger,
+                        resetObject,
+                        "Reset"
+                );
+            }
         }
         catch (Exception e) {
             Helper.log(
