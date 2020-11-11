@@ -2,8 +2,9 @@ package processing.threading;
 
 import processing.UndoRedo;
 import processing.boardobject.BoardObject;
-import processing.server.board.IServerCommunication;
-import processing.server.board.ServerCommunication;
+import infrastructure.validation.logger.ILogger;
+import infrastructure.validation.logger.LogLevel;
+import infrastructure.validation.logger.LoggerFactory;
 
 /**
  * Wrapper class implementing Runnable interface for threading of the redo operation
@@ -20,14 +21,35 @@ public class Redo implements Runnable {
      * results in redo operation done by this client
      */
     public void run() {
-        BoardObject objectToBeSent = UndoRedo.redo();
+        ILogger logger = null;
 
-        /*
-         * Sending the redo operation object to the board server
-         */
-        if (objectToBeSent != null) {
-            IServerCommunication communicator = new ServerCommunication();
-            communicator.sendObject(objectToBeSent);
+        try {
+            logger = LoggerFactory.getLoggerInstance();
+            BoardObject objectToBeSent = UndoRedo.redo();
+
+            Helper.log(
+                logger,
+                LogLevel.INFO,
+                "UndoRedo.redo Successful"
+            );
+
+            /*
+             * Sending the redo operation object to the board server
+             */
+            if (objectToBeSent != null) {
+                Helper.sendToBoardServer(
+                    logger,
+                    objectToBeSent,
+                    "Redo"
+                );
+            }
+        }
+        catch (Exception e) {
+            Helper.log(
+                logger,
+                LogLevel.ERROR,
+                "Redo failed"
+            );
         }
     }
 }

@@ -3,8 +3,7 @@ package processing.threading;
 import processing.utility.*;
 import processing.SelectDelete;
 import processing.boardobject.BoardObject;
-import processing.server.board.ServerCommunication;
-import processing.server.board.IServerCommunication;
+import infrastructure.validation.logger.*;
 
 /**
  * Wrapper class implementing Runnable interface for threading of the delete operation
@@ -21,7 +20,7 @@ public class Delete implements Runnable {
      * Initializes board object and user id needed by delete as arguments
      *
      * @param object object to be deleted
-     * @param userId user id of the user deleting the object
+     * @param userId user id of the user deleting this object
      */
     public Delete (BoardObject object, UserId userId) {
         this.object = object;
@@ -30,17 +29,44 @@ public class Delete implements Runnable {
 
     /**
      * Deletes the object which was initialized
-     * Sends it to the Server Communicator
+     * and sends it to the board server
      */
     public void run() {
-        BoardObject deleteOperationObject = SelectDelete.delete(this.object, this.userId);
+        ILogger logger = null;
 
-        /*
-         * Sending the delete operation object to the board server
-         */
-        if (deleteOperationObject != null) {
-            IServerCommunication communicator = new ServerCommunication();
-            communicator.sendObject(deleteOperationObject);
+        try {
+            logger = LoggerFactory.getLoggerInstance();
+
+            BoardObject deleteOperationObject =
+                SelectDelete.delete(
+                    this.object,
+                    this.userId
+                );
+
+            Helper.log(
+                logger,
+                LogLevel.INFO,
+                "SelectDelete.delete Successful"
+            );
+
+            /*
+             * Sending the delete operation object to the board server
+             */
+            if (deleteOperationObject != null) {
+                Helper.sendToBoardServer(
+                    logger,
+                    deleteOperationObject,
+                    "Delete"
+                );
+            }
+
+        }
+        catch (Exception e) {
+            Helper.log(
+                logger,
+                LogLevel.ERROR,
+                "Delete failed"
+            );
         }
     }
 }

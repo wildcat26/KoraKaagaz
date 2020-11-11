@@ -43,66 +43,40 @@ public class DrawRectangle implements Runnable {
      */
     public void run() {
         ILogger logger = null;
-        String threadId = "";
 
         try {
             logger = LoggerFactory.getLoggerInstance();
-            threadId = "[" + Thread.currentThread().getId() + "] ";
 
             BoardObject rectangleObject =
-                    BoardObjectBuilder.drawRectangle(
-                            topLeft,
-                            bottomRight,
-                            intensity
-                    );
+                BoardObjectBuilder.drawRectangle(
+                    topLeft,
+                    bottomRight,
+                    intensity
+                );
 
-            logger.log(
-                    ModuleID.PROCESSING,
-                    LogLevel.INFO,
-                    threadId + "BoardObjectBuilder.drawRectangle Successful"
+            Helper.log(
+                logger,
+                LogLevel.INFO,
+                "BoardObjectBuilder.drawRectangle Successful"
             );
 
             /*
              * Sending the create operation object to the board server
              */
-            try {
-                if (rectangleObject != null) {
-                    IServerCommunication communicator = new ServerCommunication();
-                    communicator.sendObject(rectangleObject);
-
-                    logger.log(
-                            ModuleID.PROCESSING,
-                            LogLevel.SUCCESS,
-                            threadId + "DrawRectangle: Object Successfully sent to Board Server"
-                    );
-                }
-                else {
-                    logger.log(
-                            ModuleID.PROCESSING,
-                            LogLevel.INFO,
-                            threadId + "DrawRectangle: Null Object created, not sent to Board Server"
-                    );
-                }
-            }
-            catch (Exception e) {
-                logger.log(
-                        ModuleID.PROCESSING,
-                        LogLevel.ERROR,
-                        threadId + "DrawRectangle: Sending to Board Server Failed"
+            if (rectangleObject != null) {
+                Helper.sendToBoardServer(
+                    logger,
+                    rectangleObject,
+                    "DrawRectangle"
                 );
             }
         }
         catch (Exception e) {
-            if (logger == null) {
-                // Unable to get logger instance ; cannot log the same
-                return;
-            } else {
-                logger.log(
-                        ModuleID.PROCESSING,
-                        LogLevel.ERROR,
-                        threadId + "DrawRectangle failed"
-                );
-            }
+            Helper.log(
+                logger,
+                LogLevel.ERROR,
+                "DrawRectangle failed"
+            );
         }
     }
 }

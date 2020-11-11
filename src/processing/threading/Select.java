@@ -1,8 +1,9 @@
 package processing.threading;
 
-import java.util.ArrayList;
 import processing.utility.*;
+import java.util.ArrayList;
 import processing.SelectDelete;
+import infrastructure.validation.logger.*;
 
 /**
  * Wrapper class implementing Runnable interface for threading of the select operation
@@ -38,6 +39,25 @@ public class Select implements Runnable {
      * Computes the selected object and its positions from the input positions
      */
     public void run() {
-        this.selectedObjectPositions = SelectDelete.select(inputPositions);
+        ILogger logger = null;
+
+        try {
+            logger = LoggerFactory.getLoggerInstance();
+            this.selectedObjectPositions = SelectDelete.select(inputPositions);
+
+            Helper.log(
+                logger,
+                LogLevel.INFO,
+                "SelectDelete.select Successful"
+            );
+        }
+        catch (Exception e) {
+            this.selectedObjectPositions = null;
+            Helper.log(
+                logger,
+                LogLevel.ERROR,
+                "Select failed"
+            );
+        }
     }
 }

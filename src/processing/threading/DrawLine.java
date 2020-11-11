@@ -4,8 +4,6 @@ import processing.utility.*;
 import infrastructure.validation.logger.*;
 import processing.boardobject.BoardObject;
 import processing.shape.BoardObjectBuilder;
-import processing.server.board.ServerCommunication;
-import processing.server.board.IServerCommunication;
 
 /**
  * Wrapper class implementing Runnable interface for threading of the draw line operation
@@ -43,67 +41,40 @@ public class DrawLine implements Runnable {
      */
     public void run() {
         ILogger logger = null;
-        String threadId = "";
 
         try {
             logger = LoggerFactory.getLoggerInstance();
-            threadId = "[" + Thread.currentThread().getId() + "] ";
 
             BoardObject lineObject =
-                    BoardObjectBuilder.drawSegment(
-                            pointA,
-                            pointB,
-                            intensity
-                    );
+                BoardObjectBuilder.drawSegment(
+                    pointA,
+                    pointB,
+                    intensity
+                );
 
-            logger.log(
-                    ModuleID.PROCESSING,
-                    LogLevel.INFO,
-                    threadId + "BoardObjectBuilder.drawSegment Successful"
+            Helper.log(
+                logger,
+                LogLevel.INFO,
+                "BoardObjectBuilder.drawSegment Successful"
             );
 
             /*
              * Sending the create operation object to the board server
              */
-            try {
-                if (lineObject != null) {
-                    IServerCommunication communicator = new ServerCommunication();
-                    communicator.sendObject(lineObject);
-
-                    logger.log(
-                            ModuleID.PROCESSING,
-                            LogLevel.SUCCESS,
-                            threadId + "DrawLine: Object Successfully sent to the Board Server"
-                    );
-                }
-                else {
-                    logger.log(
-                            ModuleID.PROCESSING,
-                            LogLevel.INFO,
-                            threadId + "DrawLine: Null Object created, not sent to Board Server"
-                    );
-                }
-            }
-            catch (Exception e) {
-                logger.log(
-                        ModuleID.PROCESSING,
-                        LogLevel.ERROR,
-                        threadId + "DrawLine: Sending to Board Server Failed"
+            if (lineObject != null) {
+                Helper.sendToBoardServer(
+                    logger,
+                    lineObject,
+                    "DrawLine"
                 );
             }
         }
         catch (Exception e) {
-            if (logger == null) {
-                // Unable to get logger instance ; cannot log the same
-                return;
-            }
-            else {
-                logger.log(
-                        ModuleID.PROCESSING,
-                        LogLevel.ERROR,
-                        threadId + "DrawLine failed"
-                );
-            }
+            Helper.log(
+                logger,
+                LogLevel.ERROR,
+                "DrawLine failed"
+            );
         }
     }
 }

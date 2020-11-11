@@ -1,10 +1,9 @@
 package processing.threading;
 
 import processing.utility.*;
+import infrastructure.validation.logger.*;
 import processing.boardobject.BoardObject;
 import processing.ParameterizedOperationsUtil;
-import processing.server.board.ServerCommunication;
-import processing.server.board.IServerCommunication;
 
 /**
  * Wrapper class implementing Runnable interface for threading of the color change operation
@@ -28,18 +27,40 @@ public class ColorChange implements Runnable {
      * Sends it to the Server Communicator
      */
     public void run() {
-        BoardObject colorChangeOperationObject =
-                ParameterizedOperationsUtil.colorChange(
-                        object,
-                        userId,
-                        intensity);
+        ILogger logger = null;
 
-        /*
-         * Sending the color change operation object to the board server
-         */
-        if (colorChangeOperationObject != null) {
-            IServerCommunication communicator = new ServerCommunication();
-            communicator.sendObject(colorChangeOperationObject);
+        try {
+            logger = LoggerFactory.getLoggerInstance();
+            BoardObject colorChangeOperationObject =
+                ParameterizedOperationsUtil.colorChange(
+                    object,
+                    userId,
+                    intensity
+                );
+
+            Helper.log(
+                logger,
+                LogLevel.INFO,
+                "ParameterizedOperationsUtil.colorChange Successful"
+            );
+
+            /*
+             * Sending the color change operation object to the board server
+             */
+            if (colorChangeOperationObject != null) {
+                Helper.sendToBoardServer(
+                    logger,
+                    colorChangeOperationObject,
+                    "ColorChange"
+                );
+            }
+        }
+        catch (Exception e) {
+            Helper.log(
+                logger,
+                LogLevel.ERROR,
+                "ColorChange failed"
+            );
         }
     }
 }

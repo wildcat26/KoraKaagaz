@@ -1,13 +1,10 @@
 package processing.threading;
 
 import java.util.ArrayList;
-
 import processing.utility.*;
 import processing.CurveBuilder;
 import infrastructure.validation.logger.*;
 import processing.boardobject.BoardObject;
-import processing.server.board.ServerCommunication;
-import processing.server.board.IServerCommunication;
 import processing.boardobject.IBoardObjectOperation;
 
 /**
@@ -60,63 +57,44 @@ public class DrawCurve implements Runnable {
      */
     public void run() {
         ILogger logger = null;
-        String threadId = "";
 
         try {
             logger = LoggerFactory.getLoggerInstance();
-            threadId = "[" + Thread.currentThread().getId() + "] ";
 
             BoardObject objectCreated =
-                    CurveBuilder.drawCurve(
-                            pixels,
-                            newBoardOp,
-                            newObjectId,
-                            newTimestamp,
-                            newUserId,
-                            prevPixelIntensity,
-                            reset
-                    );
+                CurveBuilder.drawCurve(
+                    pixels,
+                    newBoardOp,
+                    newObjectId,
+                    newTimestamp,
+                    newUserId,
+                    prevPixelIntensity,
+                    reset
+                );
+
+            Helper.log(
+                logger,
+                LogLevel.INFO,
+                "BoardObjectBuilder.drawCurve Successful"
+            );
 
             /*
              * Sending the create operation object to the board server
              */
-            try {
-                if (objectCreated != null) {
-                    IServerCommunication communicator = new ServerCommunication();
-                    communicator.sendObject(objectCreated);
-
-                    logger.log(
-                            ModuleID.PROCESSING,
-                            LogLevel.SUCCESS,
-                            threadId + "DrawCurve: Object Successfully sent to the Board Server"
-                    );
-                } else {
-                    logger.log(
-                            ModuleID.PROCESSING,
-                            LogLevel.INFO,
-                            threadId + "DrawCurve: Null Object created, not sent to Board Server"
-                    );
-                }
-            } catch (Exception e) {
-                logger.log(
-                        ModuleID.PROCESSING,
-                        LogLevel.ERROR,
-                        threadId + "DrawCurve: Sending to Board Server Failed"
+            if (objectCreated != null) {
+                Helper.sendToBoardServer(
+                    logger,
+                    objectCreated,
+                    "DrawCurve"
                 );
             }
         }
         catch (Exception e) {
-            if (logger == null) {
-                // Unable to get logger instance ; cannot log the same
-                return;
-            }
-            else {
-                logger.log(
-                        ModuleID.PROCESSING,
-                        LogLevel.ERROR,
-                        threadId + "DrawCurve failed"
-                );
-            }
+            Helper.log(
+                logger,
+                LogLevel.ERROR,
+                "DrawCurve failed"
+            );
         }
     }
 }

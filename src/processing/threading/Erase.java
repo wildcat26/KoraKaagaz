@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import processing.utility.*;
 import processing.CurveBuilder;
 import processing.boardobject.BoardObject;
-import processing.server.board.ServerCommunication;
-import processing.server.board.IServerCommunication;
+import infrastructure.validation.logger.*;
 import processing.boardobject.IBoardObjectOperation;
 
 /**
@@ -22,13 +21,23 @@ public class Erase implements Runnable {
     private final UserId newUserId;
     private final Boolean reset;
 
+    /**
+     * Initializes parameters needed by the erase operation
+     *
+     * @param position list of positions to be erased
+     * @param newBoardOp board object operation
+     * @param newObjectId object id of the erase object
+     * @param newTimestamp timestamp of the erase object
+     * @param newUserId user id of the creator of the object
+     * @param reset true only if the current object is a reset object
+     */
     public Erase (
-            ArrayList<Position> position,
-            IBoardObjectOperation newBoardOp,
-            ObjectId newObjectId,
-            Timestamp newTimestamp,
-            UserId newUserId,
-            Boolean reset
+        ArrayList<Position> position,
+        IBoardObjectOperation newBoardOp,
+        ObjectId newObjectId,
+        Timestamp newTimestamp,
+        UserId newUserId,
+        Boolean reset
     ) {
         this.position = position;
         this.newBoardOp = newBoardOp;
@@ -38,21 +47,46 @@ public class Erase implements Runnable {
         this.reset = reset;
     }
 
+    /**
+     * Performs the erase operation and sends the object to the board server
+     */
     public void run() {
-        BoardObject eraseObject =
+        ILogger logger = null;
+
+        try {
+            logger = LoggerFactory.getLoggerInstance();
+
+            BoardObject eraseObject =
                 CurveBuilder.eraseCurve(
-                        position,
-                        newBoardOp,
-                        newObjectId,
-                        newTimestamp,
-                        newUserId,
-                        reset
+                    position,
+                    newBoardOp,
+                    newObjectId,
+                    newTimestamp,
+                    newUserId,
+                    reset
                 );
 
-        /*
-         * Sending the erase operation object to the board server
-         */
-        IServerCommunication communicator = new ServerCommunication();
-        communicator.sendObject(eraseObject);
+            Helper.log(
+                logger,
+                LogLevel.INFO,
+                "BoardObjectBuilder.eraseCurve Successful"
+            );
+
+            /*
+             * Sending the erase operation object to the board server
+             */
+            Helper.sendToBoardServer(
+                logger,
+                eraseObject,
+                "Erase"
+            );
+        }
+        catch (Exception e) {
+            Helper.log(
+                logger,
+                LogLevel.ERROR,
+                "Erase failed"
+            );
+        }
     }
 }
