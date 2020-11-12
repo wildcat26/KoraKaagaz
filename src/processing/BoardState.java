@@ -359,19 +359,34 @@ public class BoardState implements Serializable {
 	 * @param boardObject board object to be inserted into the maps
 	 */
 	public void insertObjectIntoMaps (BoardObject boardObject) {
+		ObjectId objId;
+		Timestamp timestamp;
+		ArrayList<Position> positions;
+		PriorityQueueObject pqObject;
+
 		try {
-			ObjectId objId = boardObject.getObjectId();
-			Timestamp timestamp = boardObject.getTimestamp();
-			ArrayList<Position> positions = boardObject.getPositions();
-			PriorityQueueObject pqObject = new PriorityQueueObject(objId, timestamp);
+			objId = boardObject.getObjectId();
+			timestamp = boardObject.getTimestamp();
+			positions = boardObject.getPositions();
+			pqObject = new PriorityQueueObject(objId, timestamp);
 
 			logger.log(
 					ModuleID.PROCESSING,
 					LogLevel.INFO,
 					"[#" + Thread.currentThread().getId() + "] insertObjectIntoMaps: "
-							+ "could not insert the board object into the maps"
+							+ "got the board object's data members"
 			);
-
+		}
+		catch (Exception e) {
+			logger.log(
+					ModuleID.PROCESSING,
+					LogLevel.ERROR,
+					"[#" + Thread.currentThread().getId() + "] insertObjectIntoMaps: "
+							+ "could not get board object data members"
+			);
+			return;
+		}
+		try {
 			insertObjectIntoMap(boardObject);
 			logger.log(
 					ModuleID.PROCESSING,
@@ -379,21 +394,31 @@ public class BoardState implements Serializable {
 					"[#" + Thread.currentThread().getId() + "] insertObjectIntoMaps: "
 							+ "inserted the object into objectId -> BoardObject map"
 			);
-
+		}
+		catch (Exception e) {
+			logger.log(
+					ModuleID.PROCESSING,
+					LogLevel.ERROR,
+					"[#" + Thread.currentThread().getId() + "] insertObjectIntoMaps: "
+							+ "couldn't insert the object into objectId -> BoardObject map"
+			);
+			return;
+		}
+		try {
 			insertIntoPQ(positions, pqObject);
 			logger.log(
 					ModuleID.PROCESSING,
 					LogLevel.SUCCESS,
 					"[#" + Thread.currentThread().getId() + "] insertObjectIntoMaps: "
-							+ "inserted the board object into the maps"
+							+ "inserted the board object into both the maps"
 			);
 		}
 		catch (Exception e) {
 			logger.log(
-				ModuleID.PROCESSING,
-				LogLevel.ERROR,
-				"[#" + Thread.currentThread().getId() + "] insertObjectIntoMaps: "
-					+ "could not insert the board object into the maps"
+					ModuleID.PROCESSING,
+					LogLevel.ERROR,
+					"[#" + Thread.currentThread().getId() + "] insertObjectIntoMaps: "
+							+ "couldn't insert the board object into Position to PriorityQueue map"
 			);
 		}
 	}
@@ -408,19 +433,57 @@ public class BoardState implements Serializable {
 	 * @return a copy of the board object removed from the maps
 	 */
 	public BoardObject removeObjectFromMaps (ObjectId objectId) {
-		BoardObject remove = removeObjectFromMap(objectId);
-		if (remove == null) {
-			return null;			// object not present already
+		BoardObject remove;
+		try {
+			remove = removeObjectFromMap(objectId);
+			if (remove == null) {
+				// object not present already
+				return null;
+			}
+			logger.log(
+					ModuleID.PROCESSING,
+					LogLevel.INFO,
+					"[#" + Thread.currentThread().getId() + "] removeObjectFromMaps: "
+							+ "removed the board object from objectId -> BoardObject map"
+			);
+		}
+		catch (Exception e) {
+			logger.log(
+					ModuleID.PROCESSING,
+					LogLevel.ERROR,
+					"[#" + Thread.currentThread().getId() + "] removeObjectFromMaps: "
+							+ "couldn't remove the board object from objectId -> BoardObject map"
+			);
+			return null;
 		}
 
-		Timestamp timestamp = remove.getTimestamp();
+		try {
+			Timestamp timestamp = remove.getTimestamp();
+			ArrayList<Position> positions = remove.getPositions();
 
-		ArrayList<Position> positions = remove.getPositions();
+			// constructing the new Priority Queue object to be removed
+			PriorityQueueObject pqRemoveObject = new PriorityQueueObject(objectId, timestamp);
 
-		PriorityQueueObject pqRemoveObject = new PriorityQueueObject(objectId, timestamp);
+			removeFromPQ(positions, pqRemoveObject);
 
-		removeFromPQ(positions, pqRemoveObject);
-		return remove;
+			logger.log(
+					ModuleID.PROCESSING,
+					LogLevel.SUCCESS,
+					"[#" + Thread.currentThread().getId() + "] removeObjectFromMaps: "
+							+ "returning the board object removed from both the maps"
+			);
+
+			return remove;
+		}
+		catch (Exception e) {
+			logger.log(
+					ModuleID.PROCESSING,
+					LogLevel.ERROR,
+					"[#" + Thread.currentThread().getId() + "] removeObjectFromMaps: "
+							+ "couldn't remove the BoardObject from Position -> PriorityQueue map"
+			);
+			return null;
+		}
 	}
 
 	/**
