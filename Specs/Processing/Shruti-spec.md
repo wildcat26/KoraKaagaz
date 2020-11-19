@@ -201,9 +201,9 @@ The `getUserNameOfSelectedObject` returns the username of the user who most rece
 ```java
     public static class SelectDelete {
 
-            public static ArrayList<Pixel> select (ArrayList <Position> positions)
+            public static ArrayList<Pixel> select (ArrayList <Position> positions);
 
-            public static BoardObject delete (BoardObject object, UserId userId)
+            public static BoardObject delete (BoardObject object, UserId userId);
     }
 ```
 
